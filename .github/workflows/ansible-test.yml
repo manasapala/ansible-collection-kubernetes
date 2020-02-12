@@ -53,3 +53,25 @@ jobs:
 
       - name: Upload coverage data
         run: tests/coverage.sh
+
+  kind-cluster:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+        with:
+          path: ansible_collections/community/kubernetes
+
+      - name: Set up KinD cluster
+        uses: engineerd/setup-kind@v0.3.0
+
+      - name: Set up Python ${{ matrix.python_version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python_version }}
+
+      - name: Install ansible-base
+        run: pip install git+https://github.com/ansible-collection-migration/ansible-base.git --disable-pip-version-check
+
+      - name: Test getting KinD cluster info (TODO, remove)
+        run: kubectl get pods --all-namespaces
