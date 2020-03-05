@@ -54,8 +54,20 @@ jobs:
       - name: Run integration tests on Python ${{ matrix.python_version }}
         run: ansible-test integration --docker -v --color --retry-on-error --python ${{ matrix.python_version }} --continue-on-error --diff --coverage
 
-      - name: Upload coverage data
-        run: tests/coverage.sh
+      - name: Generate coverage report.
+        run: |
+          ansible-test coverage xml -v --requirements --group-by command --group-by version ${stub:+""}
+          ls -lah .
+          ls -lah ./tests
+          ls -lah ./tests/output
+          ls -lah ./tests/output/coverage
+
+      - uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: false
+          file: ./tests/output/reports/coverage.xml
+          # flags: unittests # optional
+          # name: codecov-umbrella # optional
 
   molecule:
     runs-on: ubuntu-latest
